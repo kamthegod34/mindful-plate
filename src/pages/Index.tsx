@@ -1,7 +1,7 @@
-
 import { useState } from "react";
-import { Heart, MessageCircle, Share2, ChevronRight, ChevronLeft } from "lucide-react";
+import { Heart, MessageCircle, Share2, ChevronRight, ChevronLeft, User } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
+import { Link } from "react-router-dom";
 
 interface Post {
   id: number;
@@ -55,16 +55,16 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-beige pb-20">
-      {/* Header */}
-      <header className="sticky top-0 bg-white/80 backdrop-blur-lg border-b border-gray-200 p-4 z-40">
-        <h1 className="text-2xl font-semibold text-olive text-center">MindfulPlate</h1>
+      <header className="sticky top-0 bg-white/80 backdrop-blur-lg p-4 z-40 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-olive italic">MindfulPlate</h1>
+        <Link to="/profile" className="p-2 hover:bg-beige-light rounded-full transition-colors">
+          <User className="w-6 h-6 text-olive" />
+        </Link>
       </header>
 
-      {/* Feed */}
       <div className="max-w-xl mx-auto p-4 space-y-6">
         {mockPosts.map((post) => (
           <article key={post.id} className="bg-white rounded-xl shadow-sm overflow-hidden animate-slide-up">
-            {/* Post Header */}
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-full bg-beige-dark"></div>
@@ -75,7 +75,6 @@ const Index = () => {
               )}
             </div>
 
-            {/* Image Gallery */}
             <div className="relative">
               <div className="relative aspect-square overflow-hidden">
                 <img
@@ -106,7 +105,6 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Actions */}
             <div className="p-4 flex items-center space-x-4">
               <button className="text-gray-700 hover:text-olive transition-colors">
                 <Heart className="w-6 h-6" />
@@ -119,7 +117,6 @@ const Index = () => {
               </button>
             </div>
 
-            {/* Caption & Macros */}
             <div className="px-4 pb-4">
               <p className="mb-2">
                 <span className="font-medium">{post.username}</span>{" "}
