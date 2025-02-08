@@ -11,6 +11,7 @@ import Fridge from "./pages/Fridge";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
+import FAQs from "./pages/FAQs";
 import NotFound from "./pages/NotFound";
 import SavedPosts from "./pages/SavedPosts";
 import LikedPosts from "./pages/LikedPosts";
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/help" element={<Help />} />
+          <Route path="/faqs" element={<FAQs />} />
           <Route path="/saved" element={<SavedPosts />} />
           <Route path="/liked" element={<LikedPosts />} />
           <Route path="/notifications" element={<Notifications />} />

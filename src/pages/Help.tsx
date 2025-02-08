@@ -19,60 +19,42 @@ const Help = () => {
       </header>
 
       <div className="p-6 space-y-6">
+        {/* Support Section */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold text-olive mb-4">FAQs – MindfulPlate: Your Food Journey 🍽️</h2>
+          <h2 className="text-2xl font-semibold text-olive">Help & Support – Nektar AI Assistant</h2>
+          <p className="text-olive/80">Need quick answers? Our AI-powered assistant is here to help.</p>
           
-          <Accordion type="single" collapsible className="w-full space-y-2">
-            <AccordionItem value="what-is">
-              <AccordionTrigger className="text-olive hover:no-underline">
-                What is MindfulPlate?
-              </AccordionTrigger>
-              <AccordionContent className="text-olive/80">
-                MindfulPlate is a social platform that helps you share your food journey, track your nutrition, and connect with others who love food. Share meals, discover recipes, and join a community that celebrates mindful eating.
-              </AccordionContent>
-            </AccordionItem>
+          <div className="space-y-4 mt-6">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">🔹</span>
+              <p className="text-olive/80">Instant Support – Get answers to common questions, troubleshoot issues, and find help on the go.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">🔹</span>
+              <p className="text-olive/80">24/7 Availability – No waiting times—our chatbot is always ready to assist.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">🔹</span>
+              <p className="text-olive/80">Seamless Integration – Powered by AI, trained to assist with posting, reporting issues, and managing your account.</p>
+            </div>
+          </div>
 
-            <AccordionItem value="post">
-              <AccordionTrigger className="text-olive hover:no-underline">
-                How do I post my food photos?
-              </AccordionTrigger>
-              <AccordionContent className="text-olive/80">
-                Tap the "+" button in the navigation bar, upload your meal photo, add details like ingredients and macros, write a caption, and share with the community!
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="save">
-              <AccordionTrigger className="text-olive hover:no-underline">
-                Can I save posts for later?
-              </AccordionTrigger>
-              <AccordionContent className="text-olive/80">
-                Yes! Tap the bookmark icon on any post to save it to your collection. View all saved posts in your settings under "Saved Posts."
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="notifications">
-              <AccordionTrigger className="text-olive hover:no-underline">
-                How do I manage notifications?
-              </AccordionTrigger>
-              <AccordionContent className="text-olive/80">
-                Go to Settings {'>'} Notifications to customize your notification preferences, including push notifications and temporary muting options.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="privacy">
-              <AccordionTrigger className="text-olive hover:no-underline">
-                Who can see my posts?
-              </AccordionTrigger>
-              <AccordionContent className="text-olive/80">
-                Your posts are public by default, allowing the community to discover and engage with your content. Profile privacy settings will be available soon.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <div className="mt-6 space-y-4">
+            <p className="text-olive/80">
+              <span className="text-xl">💬</span> Talk to Nektar AI – Access the chatbot in Settings > Help & Support or via our website.
+            </p>
+            <p className="text-olive/80">
+              For further assistance, contact{" "}
+              <a href="mailto:support@nektarapp.com" className="text-olive hover:underline">
+                support@nektarapp.com
+              </a>
+            </p>
+          </div>
         </div>
 
         <div className="space-y-1 mt-6">
           {[
-            { label: "Support", path: "/support" },
+            { label: "FAQs", path: "/faqs" },
             { label: "Privacy Policy", path: "/privacy" },
             { label: "Terms & Conditions", path: "/terms" },
           ].map((item, index) => (
