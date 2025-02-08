@@ -41,7 +41,7 @@ const Help = () => {
 
           <div className="mt-6 space-y-4">
             <p className="text-olive/80">
-              <span className="text-xl">💬</span> Talk to Nektar AI – Access the chatbot in Settings > Help & Support or via our website.
+              <span className="text-xl">💬</span> Talk to Nektar AI – Access the chatbot in Settings {'->'} Help & Support or via our website.
             </p>
             <p className="text-olive/80">
               For further assistance, contact{" "}
