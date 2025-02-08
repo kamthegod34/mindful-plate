@@ -18,6 +18,8 @@ import Notifications from "./pages/Notifications";
 import About from "./pages/About";
 import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,8 @@ const App = () => (
           <Route path="/liked" element={<LikedPosts />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

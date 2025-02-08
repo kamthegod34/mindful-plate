@@ -55,7 +55,7 @@ const Help = () => {
                 How do I manage notifications?
               </AccordionTrigger>
               <AccordionContent className="text-olive/80">
-                Go to Settings > Notifications to customize your notification preferences, including push notifications and temporary muting options.
+                Go to Settings {'>'} Notifications to customize your notification preferences, including push notifications and temporary muting options.
               </AccordionContent>
             </AccordionItem>
 
