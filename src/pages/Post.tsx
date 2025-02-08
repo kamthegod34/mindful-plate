@@ -53,11 +53,11 @@ const Post = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="sticky top-0 bg-white/80 backdrop-blur-sm p-4 z-40 flex items-center justify-between border-b border-gray-100">
-        <h1 className="text-xl font-semibold text-gray-800 tracking-tight">MindfulPlate</h1>
-        <Link to="/profile" className="p-2 hover:bg-gray-50 rounded-full transition-colors">
-          <User className="w-5 h-5 text-gray-700" />
+    <div className="min-h-screen bg-beige">
+      <header className="sticky top-0 bg-beige/80 backdrop-blur-sm p-4 z-40 flex items-center justify-between border-b border-olive/10">
+        <h1 className="text-xl font-semibold text-olive tracking-tight">MindfulPlate</h1>
+        <Link to="/profile" className="p-2 hover:bg-beige-light rounded-full transition-colors">
+          <User className="w-5 h-5 text-olive" />
         </Link>
       </header>
 
@@ -67,10 +67,10 @@ const Post = () => {
           <div className="flex gap-4">
             <Label
               htmlFor="camera"
-              className="flex-1 h-40 border border-gray-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-all group"
+              className="flex-1 h-40 border border-olive/20 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-beige-light transition-all group"
             >
-              <Camera className="w-6 h-6 text-gray-400 group-hover:text-gray-600 mb-2" />
-              <span className="text-sm text-gray-500 group-hover:text-gray-700">Take Photo</span>
+              <Camera className="w-6 h-6 text-olive/60 group-hover:text-olive mb-2" />
+              <span className="text-sm text-olive/80 group-hover:text-olive">Take Photo</span>
               <Input
                 id="camera"
                 type="file"
@@ -83,10 +83,10 @@ const Post = () => {
 
             <Label
               htmlFor="gallery"
-              className="flex-1 h-40 border border-gray-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-all group"
+              className="flex-1 h-40 border border-olive/20 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-beige-light transition-all group"
             >
-              <ImageIcon className="w-6 h-6 text-gray-400 group-hover:text-gray-600 mb-2" />
-              <span className="text-sm text-gray-500 group-hover:text-gray-700">Upload Media</span>
+              <ImageIcon className="w-6 h-6 text-olive/60 group-hover:text-olive mb-2" />
+              <span className="text-sm text-olive/80 group-hover:text-olive">Upload Media</span>
               <Input
                 id="gallery"
                 type="file"
@@ -127,9 +127,9 @@ const Post = () => {
               {mediaFiles.length < 10 && (
                 <Label
                   htmlFor="add-more"
-                  className="aspect-square border border-gray-200 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all group"
+                  className="aspect-square border border-olive/20 rounded-xl flex items-center justify-center cursor-pointer hover:bg-beige-light transition-all group"
                 >
-                  <Plus className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+                  <Plus className="w-5 h-5 text-olive/60 group-hover:text-olive" />
                   <Input
                     id="add-more"
                     type="file"
@@ -145,48 +145,48 @@ const Post = () => {
         </div>
 
         {/* Options Section */}
-        <div className="space-y-3 bg-gray-50/50 p-6 rounded-xl">
+        <div className="space-y-3 bg-beige-light/50 p-6 rounded-xl">
           <div className="flex items-center space-x-3">
             <Checkbox
               id="show-macros"
               checked={showMacros}
               onCheckedChange={(checked) => setShowMacros(checked as boolean)}
-              className="data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-800"
+              className="data-[state=checked]:bg-olive data-[state=checked]:border-olive"
             />
-            <Label htmlFor="show-macros" className="text-gray-700">Show Macros</Label>
+            <Label htmlFor="show-macros" className="text-olive">Show Macros</Label>
           </div>
           <div className="flex items-center space-x-3">
             <Checkbox
               id="show-ingredients"
               checked={showIngredients}
               onCheckedChange={(checked) => setShowIngredients(checked as boolean)}
-              className="data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-800"
+              className="data-[state=checked]:bg-olive data-[state=checked]:border-olive"
             />
-            <Label htmlFor="show-ingredients" className="text-gray-700">Show Ingredients</Label>
+            <Label htmlFor="show-ingredients" className="text-olive">Show Ingredients</Label>
           </div>
           <div className="flex items-center space-x-3">
             <Checkbox
               id="show-time-cost"
               checked={showTimeAndCost}
               onCheckedChange={(checked) => setShowTimeAndCost(checked as boolean)}
-              className="data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-800"
+              className="data-[state=checked]:bg-olive data-[state=checked]:border-olive"
             />
-            <Label htmlFor="show-time-cost" className="text-gray-700">Show Time & Cost</Label>
+            <Label htmlFor="show-time-cost" className="text-olive">Show Time & Cost</Label>
           </div>
           <div className="flex items-center space-x-3">
             <Checkbox
               id="show-location"
               checked={showLocation}
               onCheckedChange={(checked) => setShowLocation(checked as boolean)}
-              className="data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-800"
+              className="data-[state=checked]:bg-olive data-[state=checked]:border-olive"
             />
-            <Label htmlFor="show-location" className="text-gray-700">Show Location</Label>
+            <Label htmlFor="show-location" className="text-olive">Show Location</Label>
           </div>
         </div>
 
         {/* Post Button */}
         <Button
-          className="w-full bg-gray-900 hover:bg-gray-800 text-white py-6 rounded-xl text-base font-medium transition-colors"
+          className="w-full bg-olive hover:bg-olive/90 text-white py-6 rounded-xl text-base font-medium transition-colors"
           disabled={mediaFiles.length === 0}
         >
           Post
