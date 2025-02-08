@@ -16,6 +16,8 @@ import SavedPosts from "./pages/SavedPosts";
 import LikedPosts from "./pages/LikedPosts";
 import Notifications from "./pages/Notifications";
 import About from "./pages/About";
+import Auth from "./pages/Auth";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/search" element={<Search />} />
           <Route path="/post" element={<Post />} />
           <Route path="/fridge" element={<Fridge />} />
