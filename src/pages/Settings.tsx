@@ -1,9 +1,25 @@
 
 import { ArrowLeft, Heart, Bell, HelpCircle, Info, LogOut, Bookmark, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Settings = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast.success("Successfully logged out");
+      navigate("/auth");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast.error("Error logging out");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-beige">
       <header className="sticky top-0 bg-beige/80 backdrop-blur-sm p-4 z-40 flex items-center gap-4 border-b border-olive/10">
@@ -35,7 +51,10 @@ const Settings = () => {
             </Link>
           ))}
           <Separator className="my-4 bg-olive/10" />
-          <button className="flex items-center gap-3 py-3 px-1 text-red-500 hover:bg-beige-light rounded-lg transition-colors w-full">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-3 py-3 px-1 text-red-500 hover:bg-beige-light rounded-lg transition-colors w-full"
+          >
             <LogOut className="w-5 h-5" />
             <span>Log Out</span>
           </button>
