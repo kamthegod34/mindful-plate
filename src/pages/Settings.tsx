@@ -1,5 +1,5 @@
 
-import { ArrowLeft, Heart, Bell, HelpCircle, Info, LogOut, Bookmark } from "lucide-react";
+import { ArrowLeft, Heart, Bell, HelpCircle, Info, LogOut, Bookmark, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 
