@@ -35,7 +35,7 @@ const Search = () => {
 
   return (
     <div className="min-h-screen bg-beige pb-20">
-      <header className="sticky top-0 bg-beige p-4 z-40 flex items-center justify-between">
+      <header className="bg-beige p-4 z-40 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-olive italic">MindfulPlate</h1>
         <Link to="/profile" className="p-2 hover:bg-beige-light rounded-full transition-colors">
           <User className="w-6 h-6 text-olive" />
@@ -51,7 +51,7 @@ const Search = () => {
             placeholder="Search users, hashtags, or communities..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-10 bg-white/80 border-gray-200"
+            className="pl-10 pr-10 bg-white/80 border-gray-200 focus:ring-0 focus:border-olive/30 caret-[#F2FCE2]"
           />
           {searchQuery && (
             <button
