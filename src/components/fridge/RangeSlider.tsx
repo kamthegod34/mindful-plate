@@ -45,7 +45,6 @@ const RangeSlider = ({
             max={max}
             step={step}
             className="w-full"
-            thumbs={2}
           />
         </div>
       </div>
