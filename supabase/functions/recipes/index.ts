@@ -1,8 +1,13 @@
 
 import { serve } from "https://deno.fresh.run/std@0.168.0/http/server.ts";
-import { corsHeaders } from "../_shared/cors.ts";
 
 const SPOONACULAR_BASE_URL = "https://api.spoonacular.com";
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+  'Content-Type': 'application/json'
+};
 
 serve(async (req) => {
   console.log('Recipe function called with method:', req.method);
@@ -100,7 +105,7 @@ serve(async (req) => {
     console.log('Successfully received response from Spoonacular');
     
     return new Response(JSON.stringify(data), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: corsHeaders
     });
 
   } catch (error) {
@@ -111,7 +116,7 @@ serve(async (req) => {
         details: error.stack 
       }), {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: corsHeaders
       }
     );
   }
