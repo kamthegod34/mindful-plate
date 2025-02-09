@@ -28,7 +28,7 @@ interface SearchResult {
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("all");
-  const [selectedDiet, setSelectedDiet] = useState<string>("");
+  const [selectedDiet, setSelectedDiet] = useState<string>("all");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -98,7 +98,7 @@ const Search = () => {
         }
       }
 
-      if ((activeFilter === "all" || activeFilter === "dietary") && !selectedDiet) {
+      if ((activeFilter === "all" || activeFilter === "dietary") && selectedDiet === "all") {
         const { data: dietary, error: dietaryError } = await supabase
           .from("dietary_requirements")
           .select("id, name, description")
@@ -187,7 +187,7 @@ const Search = () => {
               <SelectValue placeholder="Dietary" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All</SelectItem>
+              <SelectItem value="all">All</SelectItem>
               <SelectItem value="vegan">Vegan</SelectItem>
               <SelectItem value="vegetarian">Vegetarian</SelectItem>
               <SelectItem value="pescatarian">Pescatarian</SelectItem>
