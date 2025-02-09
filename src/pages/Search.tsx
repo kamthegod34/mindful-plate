@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
 import { Search as SearchIcon, User, X } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -11,27 +11,131 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
+
+interface SearchResult {
+  id: string;
+  type: 'user' | 'hashtag' | 'community' | 'dietary';
+  name?: string;
+  username?: string;
+  post_count?: number;
+  member_count?: number;
+  description?: string;
+  profile_picture?: string;
+}
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [selectedDiet, setSelectedDiet] = useState<string>("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // Mock data for demonstration
-  const searchResults = [
-    { type: "user", id: 1, username: "healthyeats", name: "Healthy Eats", avatar: "/placeholder.svg" },
-    { type: "hashtag", id: 2, name: "#vegetarian", postsCount: 1234 },
-    { type: "community", id: 3, name: "Vegan Foodies", membersCount: 5678, avatar: "/placeholder.svg" },
-  ];
+  const fetchResults = async () => {
+    if (searchQuery.trim().length === 0) {
+      setResults([]);
+      return;
+    }
 
-  const dietaryFilters = [
-    { value: "all", label: "All" },
-    { value: "vegan", label: "Vegan" },
-    { value: "vegetarian", label: "Vegetarian" },
-    { value: "pescatarian", label: "Pescatarian" },
-    { value: "keto", label: "Keto" },
-    { value: "paleo", label: "Paleo" },
-  ];
+    setLoading(true);
+    const searchTerm = `%${searchQuery}%`;
+    let data: SearchResult[] = [];
+
+    try {
+      if (activeFilter === "all" || activeFilter === "users") {
+        const { data: users, error: usersError } = await supabase
+          .from("accounts")
+          .select("id, username, full_name, profile_picture")
+          .ilike("username", searchTerm)
+          .limit(5);
+
+        if (!usersError && users) {
+          data = [
+            ...data,
+            ...users.map((user) => ({
+              ...user,
+              type: "user" as const,
+              name: user.full_name,
+            })),
+          ];
+        }
+      }
+
+      if (activeFilter === "all" || activeFilter === "hashtags") {
+        const { data: hashtags, error: hashtagsError } = await supabase
+          .from("hashtags")
+          .select("id, name, post_count")
+          .ilike("name", searchTerm)
+          .limit(5);
+
+        if (!hashtagsError && hashtags) {
+          data = [
+            ...data,
+            ...hashtags.map((hashtag) => ({
+              ...hashtag,
+              type: "hashtag" as const,
+            })),
+          ];
+        }
+      }
+
+      if (activeFilter === "all" || activeFilter === "communities") {
+        const { data: communities, error: communitiesError } = await supabase
+          .from("communities")
+          .select("id, name, member_count, description")
+          .ilike("name", searchTerm)
+          .limit(5);
+
+        if (!communitiesError && communities) {
+          data = [
+            ...data,
+            ...communities.map((community) => ({
+              ...community,
+              type: "community" as const,
+            })),
+          ];
+        }
+      }
+
+      if ((activeFilter === "all" || activeFilter === "dietary") && !selectedDiet) {
+        const { data: dietary, error: dietaryError } = await supabase
+          .from("dietary_requirements")
+          .select("id, name, description")
+          .ilike("name", searchTerm)
+          .limit(5);
+
+        if (!dietaryError && dietary) {
+          data = [
+            ...data,
+            ...dietary.map((diet) => ({
+              ...diet,
+              type: "dietary" as const,
+            })),
+          ];
+        }
+      }
+
+      setResults(data);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      fetchResults();
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery, activeFilter, selectedDiet]);
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setResults([]);
+  };
 
   return (
     <div className="min-h-screen bg-beige pb-20">
@@ -51,11 +155,11 @@ const Search = () => {
             placeholder="Search users, hashtags, or communities..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-10 bg-white/80 border-gray-200 focus:ring-0 focus:border-olive/30 caret-[#F2FCE2]"
+            className="pl-10 pr-10 bg-white/80 border-gray-200 focus:ring-0 focus:border-olive/30"
           />
           {searchQuery && (
             <button
-              onClick={() => setSearchQuery("")}
+              onClick={clearSearch}
               className="absolute right-3 top-1/2 transform -translate-y-1/2"
             >
               <X className="w-4 h-4 text-gray-400" />
@@ -74,6 +178,7 @@ const Search = () => {
               <SelectItem value="users">Users</SelectItem>
               <SelectItem value="hashtags">Hashtags</SelectItem>
               <SelectItem value="communities">Communities</SelectItem>
+              <SelectItem value="dietary">Dietary</SelectItem>
             </SelectContent>
           </Select>
 
@@ -82,48 +187,76 @@ const Search = () => {
               <SelectValue placeholder="Dietary" />
             </SelectTrigger>
             <SelectContent>
-              {dietaryFilters.map((filter) => (
-                <SelectItem key={filter.value} value={filter.value}>
-                  {filter.label}
-                </SelectItem>
-              ))}
+              <SelectItem value="">All</SelectItem>
+              <SelectItem value="vegan">Vegan</SelectItem>
+              <SelectItem value="vegetarian">Vegetarian</SelectItem>
+              <SelectItem value="pescatarian">Pescatarian</SelectItem>
+              <SelectItem value="keto">Keto</SelectItem>
+              <SelectItem value="paleo">Paleo</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* Search Results */}
         <div className="space-y-2">
-          {searchResults.map((result) => (
-            <div
-              key={`${result.type}-${result.id}`}
-              className="flex items-center p-3 bg-white/80 rounded-lg hover:bg-white transition-colors"
-            >
-              {result.type === "user" || result.type === "community" ? (
-                <>
-                  <img
-                    src={(result as any).avatar}
-                    alt=""
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                  <div className="ml-3">
-                    <p className="font-semibold">{(result as any).username || result.name}</p>
-                    {result.type === "community" && (
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-olive" />
+            </div>
+          ) : (
+            results.map((result) => (
+              <div
+                key={`${result.type}-${result.id}`}
+                className="flex items-center p-3 bg-white/80 rounded-lg hover:bg-white transition-colors"
+              >
+                {(result.type === "user" || result.type === "community") && (
+                  <>
+                    <img
+                      src={result.profile_picture || "/placeholder.svg"}
+                      alt=""
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div className="ml-3">
+                      <p className="font-semibold">
+                        {result.type === "user" ? result.username : result.name}
+                      </p>
+                      {result.type === "community" && result.member_count && (
+                        <p className="text-sm text-gray-500">
+                          {result.member_count.toLocaleString()} members
+                        </p>
+                      )}
+                      {result.description && (
+                        <p className="text-sm text-gray-500 line-clamp-1">
+                          {result.description}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
+                {result.type === "hashtag" && (
+                  <div className="py-2">
+                    <p className="font-semibold">#{result.name}</p>
+                    {result.post_count && (
                       <p className="text-sm text-gray-500">
-                        {(result as any).membersCount.toLocaleString()} members
+                        {result.post_count.toLocaleString()} posts
                       </p>
                     )}
                   </div>
-                </>
-              ) : (
-                <div className="py-2">
-                  <p className="font-semibold">{result.name}</p>
-                  <p className="text-sm text-gray-500">
-                    {(result as any).postsCount.toLocaleString()} posts
-                  </p>
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+                {result.type === "dietary" && (
+                  <div className="py-2">
+                    <p className="font-semibold">{result.name}</p>
+                    {result.description && (
+                      <p className="text-sm text-gray-500">{result.description}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+          {!loading && searchQuery && results.length === 0 && (
+            <p className="text-center text-gray-500 py-8">No results found</p>
+          )}
         </div>
       </div>
       <BottomNav />
