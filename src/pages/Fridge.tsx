@@ -28,8 +28,8 @@ const Fridge = () => {
   const [preferences, setPreferences] = useState({
     minProtein: 30,
     maxCalories: 800,
-    maxTime: 30,
-    maxCost: 20,
+    diet: '',
+    excludeIngredients: [] as string[],
   });
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(false);
@@ -68,9 +68,9 @@ const Fridge = () => {
           params: {
             ingredients,
             minProtein: preferences.minProtein,
-            maxTime: preferences.maxTime,
-            maxCost: preferences.maxCost,
             maxCalories: preferences.maxCalories,
+            diet: preferences.diet,
+            excludeIngredients: preferences.excludeIngredients,
           },
         },
       });

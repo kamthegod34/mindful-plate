@@ -41,26 +41,26 @@ serve(async (req) => {
     switch (type) {
       case 'byPreferences': {
         endpoint = '/recipes/complexSearch';
-        const { ingredients, minProtein, maxTime, maxCost, maxCalories } = params;
+        const { ingredients, minProtein, maxCalories, diet, excludeIngredients } = params;
         
         if (!ingredients || !Array.isArray(ingredients)) {
           console.error('Invalid ingredients format:', ingredients);
           throw new Error('Invalid ingredients format');
         }
         
-        // Build query parameters
+        // Build query parameters for complexSearch
         const queryParts = [
           `apiKey=${SPOONACULAR_API_KEY}`,
           `includeIngredients=${ingredients.join(',')}`,
-          `minProtein=${minProtein}`,
-          `maxReadyTime=${maxTime}`,
-          `maxPrice=${maxCost}`,
-          `maxCalories=${maxCalories}`,
+          `minProtein=${minProtein || 0}`,
+          `maxCalories=${maxCalories || 2000}`,
+          diet ? `diet=${diet}` : '',
+          excludeIngredients?.length ? `excludeIngredients=${excludeIngredients.join(',')}` : '',
           'number=10',
           'addRecipeNutrition=true',
           'fillIngredients=true',
           'addRecipeInformation=true'
-        ];
+        ].filter(Boolean); // Remove empty strings
         
         queryParams = '?' + queryParts.join('&');
         console.log('Built query URL:', `${SPOONACULAR_BASE_URL}${endpoint}${queryParams}`);

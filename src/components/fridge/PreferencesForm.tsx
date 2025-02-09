@@ -1,15 +1,17 @@
 
-import { Scale, Timer, DollarSign } from "lucide-react";
+import { Scale, DollarSign } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Preferences {
   minProtein: number;
   maxCalories: number;
-  maxTime: number;
-  maxCost: number;
+  diet: string;
+  excludeIngredients: string[];
 }
 
 interface PreferencesFormProps {
@@ -25,6 +27,22 @@ const PreferencesForm = ({
   onSearch,
   loading,
 }: PreferencesFormProps) => {
+  const handleExcludeIngredient = (ingredient: string) => {
+    if (ingredient && !preferences.excludeIngredients.includes(ingredient)) {
+      onPreferencesChange({
+        ...preferences,
+        excludeIngredients: [...preferences.excludeIngredients, ingredient]
+      });
+    }
+  };
+
+  const handleRemoveExcluded = (ingredient: string) => {
+    onPreferencesChange({
+      ...preferences,
+      excludeIngredients: preferences.excludeIngredients.filter(i => i !== ingredient)
+    });
+  };
+
   return (
     <Card className="p-6 space-y-6 bg-white/50 backdrop-blur-sm">
       <h2 className="text-xl font-semibold text-olive">Your Preferences</h2>
@@ -47,36 +65,6 @@ const PreferencesForm = ({
 
         <div className="space-y-2">
           <label className="text-sm font-medium text-olive flex items-center gap-2">
-            <Timer className="w-4 h-4" />
-            Maximum Time (minutes)
-          </label>
-          <Slider
-            value={[preferences.maxTime]}
-            onValueChange={(value) => onPreferencesChange({ ...preferences, maxTime: value[0] })}
-            max={120}
-            step={5}
-            className="w-full"
-          />
-          <span className="text-sm text-olive-light">{preferences.maxTime} min</span>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-olive flex items-center gap-2">
-            <DollarSign className="w-4 h-4" />
-            Maximum Cost ($)
-          </label>
-          <Slider
-            value={[preferences.maxCost]}
-            onValueChange={(value) => onPreferencesChange({ ...preferences, maxCost: value[0] })}
-            max={50}
-            step={5}
-            className="w-full"
-          />
-          <span className="text-sm text-olive-light">${preferences.maxCost}</span>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-olive flex items-center gap-2">
             <Scale className="w-4 h-4" />
             Maximum Calories
           </label>
@@ -88,6 +76,60 @@ const PreferencesForm = ({
             className="w-full"
           />
           <span className="text-sm text-olive-light">{preferences.maxCalories} kcal</span>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-olive">
+            Dietary Preferences
+          </label>
+          <Select
+            value={preferences.diet}
+            onValueChange={(value) => onPreferencesChange({ ...preferences, diet: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select diet type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">None</SelectItem>
+              <SelectItem value="vegetarian">Vegetarian</SelectItem>
+              <SelectItem value="vegan">Vegan</SelectItem>
+              <SelectItem value="paleo">Paleo</SelectItem>
+              <SelectItem value="gluten-free">Gluten Free</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-olive">
+            Exclude Ingredients
+          </label>
+          <div className="flex gap-2">
+            <Input
+              placeholder="Enter ingredient to exclude"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleExcludeIngredient((e.target as HTMLInputElement).value);
+                  (e.target as HTMLInputElement).value = '';
+                }
+              }}
+            />
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {preferences.excludeIngredients.map((ingredient) => (
+              <span
+                key={ingredient}
+                className="bg-olive/10 text-olive px-2 py-1 rounded-full text-sm flex items-center gap-1"
+              >
+                {ingredient}
+                <button
+                  onClick={() => handleRemoveExcluded(ingredient)}
+                  className="hover:text-olive-dark"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
