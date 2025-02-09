@@ -1,5 +1,5 @@
 
-import { Scale, DollarSign } from "lucide-react";
+import { Scale, DollarSign, Clock, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 interface Preferences {
   minProtein: number;
+  maxProtein: number;
+  minCalories: number;
   maxCalories: number;
+  minServings: number;
+  maxServings: number;
+  maxReadyTime: number;
   diet: string;
   excludeIngredients: string[];
 }
@@ -51,31 +56,104 @@ const PreferencesForm = ({
         <div className="space-y-2">
           <label className="text-sm font-medium text-olive flex items-center gap-2">
             <Scale className="w-4 h-4" />
-            Minimum Protein (g)
+            Protein Range (g)
           </label>
-          <Slider
-            value={[preferences.minProtein]}
-            onValueChange={(value) => onPreferencesChange({ ...preferences, minProtein: value[0] })}
-            max={100}
-            step={5}
-            className="w-full"
-          />
-          <span className="text-sm text-olive-light">{preferences.minProtein}g</span>
+          <div className="space-y-6">
+            <div>
+              <div className="flex justify-between text-sm text-olive-light mb-2">
+                <span>Minimum: {preferences.minProtein}g</span>
+                <span>Maximum: {preferences.maxProtein}g</span>
+              </div>
+              <Slider
+                value={[preferences.minProtein, preferences.maxProtein]}
+                onValueChange={(value) => onPreferencesChange({ 
+                  ...preferences, 
+                  minProtein: value[0],
+                  maxProtein: value[1]
+                })}
+                max={100}
+                step={5}
+                className="w-full"
+              />
+            </div>
+          </div>
         </div>
 
         <div className="space-y-2">
           <label className="text-sm font-medium text-olive flex items-center gap-2">
             <Scale className="w-4 h-4" />
-            Maximum Calories
+            Calories Range
           </label>
-          <Slider
-            value={[preferences.maxCalories]}
-            onValueChange={(value) => onPreferencesChange({ ...preferences, maxCalories: value[0] })}
-            max={2000}
-            step={50}
-            className="w-full"
-          />
-          <span className="text-sm text-olive-light">{preferences.maxCalories} kcal</span>
+          <div className="space-y-6">
+            <div>
+              <div className="flex justify-between text-sm text-olive-light mb-2">
+                <span>Minimum: {preferences.minCalories} kcal</span>
+                <span>Maximum: {preferences.maxCalories} kcal</span>
+              </div>
+              <Slider
+                value={[preferences.minCalories, preferences.maxCalories]}
+                onValueChange={(value) => onPreferencesChange({ 
+                  ...preferences, 
+                  minCalories: value[0],
+                  maxCalories: value[1]
+                })}
+                min={50}
+                max={2000}
+                step={50}
+                className="w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-olive flex items-center gap-2">
+            <Users className="w-4 h-4" />
+            Servings Range
+          </label>
+          <div className="space-y-6">
+            <div>
+              <div className="flex justify-between text-sm text-olive-light mb-2">
+                <span>Minimum: {preferences.minServings}</span>
+                <span>Maximum: {preferences.maxServings}</span>
+              </div>
+              <Slider
+                value={[preferences.minServings, preferences.maxServings]}
+                onValueChange={(value) => onPreferencesChange({ 
+                  ...preferences, 
+                  minServings: value[0],
+                  maxServings: value[1]
+                })}
+                min={1}
+                max={8}
+                step={1}
+                className="w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-olive flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            Maximum Preparation Time
+          </label>
+          <div>
+            <div className="flex justify-between text-sm text-olive-light mb-2">
+              <span>{preferences.maxReadyTime} minutes</span>
+            </div>
+            <Slider
+              value={[preferences.maxReadyTime]}
+              onValueChange={(value) => onPreferencesChange({ 
+                ...preferences, 
+                maxReadyTime: value[0]
+              })}
+              min={10}
+              max={120}
+              step={5}
+              className="w-full"
+            />
+          </div>
         </div>
 
         <div className="space-y-2">

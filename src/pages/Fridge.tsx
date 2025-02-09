@@ -26,9 +26,14 @@ const Fridge = () => {
   const { toast } = useToast();
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [preferences, setPreferences] = useState({
-    minProtein: 30,
+    minProtein: 10,
+    maxProtein: 100,
+    minCalories: 50,
     maxCalories: 800,
-    diet: '',
+    minServings: 1,
+    maxServings: 4,
+    maxReadyTime: 60,
+    diet: 'none',
     excludeIngredients: [] as string[],
   });
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -68,8 +73,13 @@ const Fridge = () => {
           params: {
             ingredients,
             minProtein: preferences.minProtein,
+            maxProtein: preferences.maxProtein,
+            minCalories: preferences.minCalories,
             maxCalories: preferences.maxCalories,
-            diet: preferences.diet,
+            minServings: preferences.minServings,
+            maxServings: preferences.maxServings,
+            maxReadyTime: preferences.maxReadyTime,
+            diet: preferences.diet === 'none' ? '' : preferences.diet,
             excludeIngredients: preferences.excludeIngredients,
           },
         },
