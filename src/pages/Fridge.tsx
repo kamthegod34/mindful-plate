@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import BottomNav from "@/components/BottomNav";
 import { User } from "lucide-react";
@@ -57,22 +56,15 @@ const Fridge = () => {
 
     setLoading(true);
     try {
-      console.log('Calling recipes function with:', {
-        type: 'byPreferences',
-        params: {
-          ingredients,
-          minProtein: preferences.minProtein,
-          maxTime: preferences.maxTime,
-          maxCost: preferences.maxCost,
-          maxCalories: preferences.maxCalories,
-        },
+      console.log('Calling recipe-handler function with:', {
+        ingredients,
+        preferences,
       });
 
-      const { data, error } = await supabase.functions.invoke('recipes', {
+      const { data, error } = await supabase.functions.invoke('recipe-handler', {
         body: {
-          type: 'byPreferences',
-          params: {
-            ingredients,
+          ingredients,
+          preferences: {
             minProtein: preferences.minProtein,
             maxTime: preferences.maxTime,
             maxCost: preferences.maxCost,
@@ -88,7 +80,7 @@ const Fridge = () => {
 
       console.log('Received response:', data);
 
-      if (!data?.results || data.results.length === 0) {
+      if (!data?.recipes || data.recipes.length === 0) {
         toast({
           title: "No recipes found",
           description: "Try adjusting your preferences or adding different ingredients.",
@@ -97,7 +89,7 @@ const Fridge = () => {
         return;
       }
 
-      setRecipes(data.results);
+      setRecipes(data.recipes);
     } catch (error) {
       console.error('Error fetching recipes:', error);
       toast({
@@ -115,12 +107,10 @@ const Fridge = () => {
     try {
       console.log('Fetching recipe details for:', recipeId);
       
-      const { data, error } = await supabase.functions.invoke('recipes', {
+      const { data, error } = await supabase.functions.invoke('recipe-handler', {
         body: {
           type: 'details',
-          params: {
-            recipeId,
-          },
+          recipeId,
         },
       });
 
@@ -130,7 +120,12 @@ const Fridge = () => {
       }
 
       console.log('Received recipe details:', data);
-      setSelectedRecipe(data);
+      
+      if (!data?.recipe) {
+        throw new Error('No recipe details received');
+      }
+      
+      setSelectedRecipe(data.recipe);
     } catch (error) {
       console.error('Error fetching recipe details:', error);
       toast({
