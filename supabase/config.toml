@@ -37,6 +37,7 @@ double_confirm_changes = true
 enable_confirmations = false
 
 [functions]
+[functions.recipe-handler]
 memory = 512
 timeout = 10
 
