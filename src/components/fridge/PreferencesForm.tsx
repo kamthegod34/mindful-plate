@@ -90,7 +90,7 @@ const PreferencesForm = ({
               <SelectValue placeholder="Select diet type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None</SelectItem>
+              <SelectItem value="none">No Restrictions</SelectItem>
               <SelectItem value="vegetarian">Vegetarian</SelectItem>
               <SelectItem value="vegan">Vegan</SelectItem>
               <SelectItem value="paleo">Paleo</SelectItem>
