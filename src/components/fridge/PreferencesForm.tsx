@@ -48,6 +48,36 @@ const PreferencesForm = ({
     });
   };
 
+  const handleProteinChange = (values: number[]) => {
+    if (values[0] !== preferences.minProtein || values[1] !== preferences.maxProtein) {
+      onPreferencesChange({
+        ...preferences,
+        minProtein: values[0],
+        maxProtein: values[1]
+      });
+    }
+  };
+
+  const handleCaloriesChange = (values: number[]) => {
+    if (values[0] !== preferences.minCalories || values[1] !== preferences.maxCalories) {
+      onPreferencesChange({
+        ...preferences,
+        minCalories: values[0],
+        maxCalories: values[1]
+      });
+    }
+  };
+
+  const handleServingsChange = (values: number[]) => {
+    if (values[0] !== preferences.minServings || values[1] !== preferences.maxServings) {
+      onPreferencesChange({
+        ...preferences,
+        minServings: values[0],
+        maxServings: values[1]
+      });
+    }
+  };
+
   return (
     <Card className="p-6 space-y-6 bg-white/50 backdrop-blur-sm">
       <h2 className="text-xl font-semibold text-olive">Your Preferences</h2>
@@ -65,12 +95,9 @@ const PreferencesForm = ({
                 <span>Maximum: {preferences.maxProtein}g</span>
               </div>
               <Slider
+                defaultValue={[preferences.minProtein, preferences.maxProtein]}
                 value={[preferences.minProtein, preferences.maxProtein]}
-                onValueChange={(value) => onPreferencesChange({ 
-                  ...preferences, 
-                  minProtein: value[0],
-                  maxProtein: value[1]
-                })}
+                onValueChange={handleProteinChange}
                 max={100}
                 step={5}
                 className="w-full"
@@ -91,12 +118,9 @@ const PreferencesForm = ({
                 <span>Maximum: {preferences.maxCalories} kcal</span>
               </div>
               <Slider
+                defaultValue={[preferences.minCalories, preferences.maxCalories]}
                 value={[preferences.minCalories, preferences.maxCalories]}
-                onValueChange={(value) => onPreferencesChange({ 
-                  ...preferences, 
-                  minCalories: value[0],
-                  maxCalories: value[1]
-                })}
+                onValueChange={handleCaloriesChange}
                 min={50}
                 max={2000}
                 step={50}
@@ -118,12 +142,9 @@ const PreferencesForm = ({
                 <span>Maximum: {preferences.maxServings}</span>
               </div>
               <Slider
+                defaultValue={[preferences.minServings, preferences.maxServings]}
                 value={[preferences.minServings, preferences.maxServings]}
-                onValueChange={(value) => onPreferencesChange({ 
-                  ...preferences, 
-                  minServings: value[0],
-                  maxServings: value[1]
-                })}
+                onValueChange={handleServingsChange}
                 min={1}
                 max={8}
                 step={1}
@@ -143,6 +164,7 @@ const PreferencesForm = ({
               <span>{preferences.maxReadyTime} minutes</span>
             </div>
             <Slider
+              defaultValue={[preferences.maxReadyTime]}
               value={[preferences.maxReadyTime]}
               onValueChange={(value) => onPreferencesChange({ 
                 ...preferences, 
