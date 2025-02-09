@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
 import { User, Search, Scale, Timer, DollarSign, ShoppingCart } from "lucide-react";
@@ -58,11 +57,22 @@ const Fridge = () => {
 
     setLoading(true);
     try {
+      console.log('Calling recipes function with:', {
+        type: 'byPreferences',
+        params: {
+          ingredients,
+          minProtein: preferences.minProtein,
+          maxTime: preferences.maxTime,
+          maxCost: preferences.maxCost,
+          maxCalories: preferences.maxCalories,
+        },
+      });
+
       const { data, error } = await supabase.functions.invoke('recipes', {
         body: {
           type: 'byPreferences',
           params: {
-            ingredients: ingredients,
+            ingredients,
             minProtein: preferences.minProtein,
             maxTime: preferences.maxTime,
             maxCost: preferences.maxCost,
@@ -71,7 +81,12 @@ const Fridge = () => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+
+      console.log('Received response:', data);
 
       if (!data?.results || data.results.length === 0) {
         toast({
@@ -87,7 +102,7 @@ const Fridge = () => {
       console.error('Error fetching recipes:', error);
       toast({
         title: "Error fetching recipes",
-        description: "Please try again later.",
+        description: "Please try again later or check the console for more details.",
         variant: "destructive",
       });
     } finally {
@@ -98,6 +113,8 @@ const Fridge = () => {
   const handleRecipeSelect = async (recipeId: string) => {
     setLoading(true);
     try {
+      console.log('Fetching recipe details for:', recipeId);
+      
       const { data, error } = await supabase.functions.invoke('recipes', {
         body: {
           type: 'details',
@@ -107,15 +124,19 @@ const Fridge = () => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching recipe details:', error);
+        throw error;
+      }
 
+      console.log('Received recipe details:', data);
       setSelectedRecipe(data);
       setShowShoppingList(false);
     } catch (error) {
       console.error('Error fetching recipe details:', error);
       toast({
         title: "Error fetching recipe details",
-        description: "Please try again later.",
+        description: "Please try again later or check the console for more details.",
         variant: "destructive",
       });
     } finally {
