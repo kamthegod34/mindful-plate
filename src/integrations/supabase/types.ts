@@ -13,11 +13,11 @@ export type Database = {
         Row: {
           created_at: string | null
           email: string
-          full_name: string
+          full_name: string | null
           id: string
           is_verified: boolean | null
           last_login: string | null
-          password: string | null
+          password: string
           profile_picture: string | null
           role: string | null
           updated_at: string | null
@@ -26,11 +26,11 @@ export type Database = {
         Insert: {
           created_at?: string | null
           email: string
-          full_name: string
+          full_name?: string | null
           id?: string
           is_verified?: boolean | null
           last_login?: string | null
-          password?: string | null
+          password: string
           profile_picture?: string | null
           role?: string | null
           updated_at?: string | null
@@ -39,11 +39,11 @@ export type Database = {
         Update: {
           created_at?: string | null
           email?: string
-          full_name?: string
+          full_name?: string | null
           id?: string
           is_verified?: boolean | null
           last_login?: string | null
-          password?: string | null
+          password?: string
           profile_picture?: string | null
           role?: string | null
           updated_at?: string | null
@@ -51,26 +51,148 @@ export type Database = {
         }
         Relationships: []
       }
+      comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       followers: {
         Row: {
           created_at: string | null
-          followed_id: string | null
-          following_id: string | null
+          followed_id: string
+          following_id: string
           id: string
         }
         Insert: {
           created_at?: string | null
-          followed_id?: string | null
-          following_id?: string | null
+          followed_id: string
+          following_id: string
           id?: string
         }
         Update: {
           created_at?: string | null
-          followed_id?: string | null
-          following_id?: string | null
+          followed_id?: string
+          following_id?: string
           id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_followed"
+            columns: ["followed_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_following"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      likes: {
+        Row: {
+          created_at: string | null
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       posts: {
         Row: {
@@ -91,7 +213,7 @@ export type Database = {
           image_url?: string | null
           likes_count?: number | null
           updated_at?: string | null
-          user_id?: string
+          user_id: string
         }
         Update: {
           caption?: string
@@ -103,7 +225,15 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       recipes: {
         Row: {
@@ -132,7 +262,7 @@ export type Database = {
           time?: number | null
           title: string
           updated_at?: string | null
-          user_id?: string
+          user_id: string
         }
         Update: {
           calories?: number | null
@@ -148,7 +278,15 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "recipes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
