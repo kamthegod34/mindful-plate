@@ -1,13 +1,13 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
-import { User, ChefHat, ShoppingCart, Heart, Timer, DollarSign, Scale } from "lucide-react";
+import { User, Search, Scale, Timer, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/components/ui/use-toast";
+import IngredientInput from "@/components/IngredientInput";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Recipe {
   id: string;
@@ -21,23 +21,9 @@ interface Recipe {
   instructions: string[];
 }
 
-const mockRecipes: Recipe[] = [
-  {
-    id: "1",
-    title: "High-Protein Chicken Bowl",
-    image: "/placeholder.svg",
-    protein: 45,
-    calories: 550,
-    time: 25,
-    cost: 15,
-    ingredients: ["Chicken breast", "Quinoa", "Broccoli", "Olive oil", "Seasonings"],
-    instructions: ["Preheat oven to 400°F", "Season chicken", "Cook quinoa", "Roast broccoli"],
-  },
-  // Add more mock recipes as needed
-];
-
 const Fridge = () => {
   const { toast } = useToast();
+  const [ingredients, setIngredients] = useState<string[]>([]);
   const [preferences, setPreferences] = useState({
     minProtein: 30,
     maxCalories: 800,
@@ -46,18 +32,89 @@ const Fridge = () => {
   });
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [showShoppingList, setShowShoppingList] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
 
-  const handleSearch = () => {
-    toast({
-      title: "Searching recipes",
-      description: "Finding recipes that match your preferences...",
-    });
-    // In a real implementation, this would call the AI/webscraping service
+  const handleAddIngredient = (ingredient: string) => {
+    if (!ingredients.includes(ingredient)) {
+      setIngredients([...ingredients, ingredient]);
+    }
   };
 
-  const handleRecipeSelect = (recipe: Recipe) => {
-    setSelectedRecipe(recipe);
-    setShowShoppingList(false);
+  const handleRemoveIngredient = (ingredient: string) => {
+    setIngredients(ingredients.filter((i) => i !== ingredient));
+  };
+
+  const handleSearch = async () => {
+    if (ingredients.length === 0) {
+      toast({
+        title: "No ingredients added",
+        description: "Please add at least one ingredient to search for recipes.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('recipes', {
+        body: {
+          type: 'byPreferences',
+          params: {
+            ingredients,
+            ...preferences,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      setRecipes(data.results || []);
+      
+      if (data.results.length === 0) {
+        toast({
+          title: "No recipes found",
+          description: "Try adjusting your preferences or adding different ingredients.",
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching recipes:', error);
+      toast({
+        title: "Error fetching recipes",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRecipeSelect = async (recipeId: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('recipes', {
+        body: {
+          type: 'details',
+          params: {
+            recipeId,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      setSelectedRecipe(data);
+      setShowShoppingList(false);
+    } catch (error) {
+      console.error('Error fetching recipe details:', error);
+      toast({
+        title: "Error fetching recipe details",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -72,6 +129,15 @@ const Fridge = () => {
       <div className="max-w-2xl mx-auto p-4 space-y-6">
         {!selectedRecipe ? (
           <>
+            <Card className="p-6 space-y-6 bg-white/50 backdrop-blur-sm">
+              <h2 className="text-xl font-semibold text-olive">Your Ingredients</h2>
+              <IngredientInput
+                ingredients={ingredients}
+                onAddIngredient={handleAddIngredient}
+                onRemoveIngredient={handleRemoveIngredient}
+              />
+            </Card>
+
             <Card className="p-6 space-y-6 bg-white/50 backdrop-blur-sm">
               <h2 className="text-xl font-semibold text-olive">Your Preferences</h2>
               
@@ -140,17 +206,19 @@ const Fridge = () => {
               <Button
                 onClick={handleSearch}
                 className="w-full bg-olive hover:bg-olive-dark text-white transition-colors"
+                disabled={loading}
               >
-                Find Recipes
+                <Search className="w-4 h-4 mr-2" />
+                {loading ? "Searching..." : "Find Recipes"}
               </Button>
             </Card>
 
             <div className="space-y-4">
-              {mockRecipes.map((recipe) => (
+              {recipes.map((recipe) => (
                 <Card
                   key={recipe.id}
                   className="p-4 hover:shadow-md transition-all cursor-pointer bg-white/50 backdrop-blur-sm"
-                  onClick={() => handleRecipeSelect(recipe)}
+                  onClick={() => handleRecipeSelect(recipe.id)}
                 >
                   <div className="flex gap-4">
                     <img

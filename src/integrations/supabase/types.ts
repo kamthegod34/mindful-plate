@@ -456,6 +456,35 @@ export type Database = {
           },
         ]
       }
+      user_ingredients: {
+        Row: {
+          created_at: string | null
+          id: string
+          ingredient_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          ingredient_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          ingredient_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_ingredients_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_preferences: {
         Row: {
           created_at: string | null
