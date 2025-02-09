@@ -37,8 +37,9 @@ double_confirm_changes = true
 enable_confirmations = false
 
 [functions]
-memory = { size = 512 }
-timeout = { duration = 10 }
+memory = 512
+timeout = 10
 
 [analytics]
 enabled = false
+
