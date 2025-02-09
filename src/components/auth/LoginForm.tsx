@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,7 +44,9 @@ export const LoginForm = () => {
 
       if (error) throw error;
 
-      toast.success("Successfully signed in!");
+      toast.success("Successfully signed in!", {
+        duration: 2000
+      });
       navigate("/settings");
     } catch (error: any) {
       console.error("Auth error:", error);
@@ -57,7 +58,9 @@ export const LoginForm = () => {
         errorMessage = "Too many attempts. Please try again later";
       }
       
-      toast.error(errorMessage);
+      toast.error(errorMessage, {
+        duration: 2000
+      });
     } finally {
       setLoading(false);
     }
