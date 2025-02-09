@@ -64,8 +64,9 @@ const Fridge = () => {
 
       const { data, error } = await supabase.functions.invoke('recipe-handler', {
         body: {
-          ingredients,
-          preferences: {
+          type: 'byPreferences',
+          params: {
+            ingredients,
             minProtein: preferences.minProtein,
             maxTime: preferences.maxTime,
             maxCost: preferences.maxCost,
@@ -81,7 +82,7 @@ const Fridge = () => {
 
       console.log('Received response:', data);
 
-      if (!data?.recipes || !Array.isArray(data.recipes) || data.recipes.length === 0) {
+      if (!data || !Array.isArray(data.results) || data.results.length === 0) {
         toast({
           title: "No recipes found",
           description: "Try adjusting your preferences or adding different ingredients.",
@@ -90,24 +91,21 @@ const Fridge = () => {
         return;
       }
 
-      // Verify the data structure before updating state
-      const validRecipes = data.recipes.filter(recipe => 
-        recipe.id && 
-        recipe.title && 
-        recipe.image && 
-        typeof recipe.protein === 'number' &&
-        typeof recipe.calories === 'number' &&
-        typeof recipe.time === 'number' &&
-        typeof recipe.cost === 'number'
-      );
+      // Transform Spoonacular response into our Recipe format
+      const transformedRecipes: Recipe[] = data.results.map(recipe => ({
+        id: recipe.id.toString(),
+        title: recipe.title,
+        image: recipe.image,
+        protein: Math.round(recipe.nutrition?.nutrients?.find(n => n.name === "Protein")?.amount || 0),
+        calories: Math.round(recipe.nutrition?.nutrients?.find(n => n.name === "Calories")?.amount || 0),
+        time: recipe.readyInMinutes || 0,
+        cost: Math.round(recipe.pricePerServing / 100) || 0, // Convert cents to dollars
+        ingredients: recipe.extendedIngredients?.map(i => i.original) || [],
+        instructions: recipe.analyzedInstructions?.[0]?.steps?.map(s => s.step) || [],
+      }));
 
-      if (validRecipes.length === 0) {
-        console.error('Invalid recipe data structure:', data.recipes);
-        throw new Error('Invalid recipe data structure received from API');
-      }
-
-      console.log('✅ Setting recipes state with:', validRecipes);
-      setRecipes(validRecipes);
+      console.log('✅ Setting recipes state with:', transformedRecipes);
+      setRecipes(transformedRecipes);
     } catch (error) {
       console.error('Error fetching recipes:', error);
       toast({
@@ -129,7 +127,9 @@ const Fridge = () => {
       const { data, error } = await supabase.functions.invoke('recipe-handler', {
         body: {
           type: 'details',
-          recipeId,
+          params: {
+            recipeId,
+          },
         },
       });
 
@@ -140,11 +140,24 @@ const Fridge = () => {
 
       console.log('Received recipe details:', data);
       
-      if (!data?.recipe) {
+      if (!data) {
         throw new Error('No recipe details received');
       }
+
+      // Transform Spoonacular recipe details into our Recipe format
+      const recipe: Recipe = {
+        id: data.id.toString(),
+        title: data.title,
+        image: data.image,
+        protein: Math.round(data.nutrition?.nutrients?.find(n => n.name === "Protein")?.amount || 0),
+        calories: Math.round(data.nutrition?.nutrients?.find(n => n.name === "Calories")?.amount || 0),
+        time: data.readyInMinutes || 0,
+        cost: Math.round(data.pricePerServing / 100) || 0,
+        ingredients: data.extendedIngredients?.map(i => i.original) || [],
+        instructions: data.analyzedInstructions?.[0]?.steps?.map(s => s.step) || [],
+      };
       
-      setSelectedRecipe(data.recipe);
+      setSelectedRecipe(recipe);
     } catch (error) {
       console.error('Error fetching recipe details:', error);
       toast({
