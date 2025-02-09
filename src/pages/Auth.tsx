@@ -6,22 +6,69 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowRight, User, Mail, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Auth = () => {
   const [isSignIn, setIsSignIn] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add authentication logic here
-    navigate("/");
+    setLoading(true);
+
+    try {
+      if (isSignIn) {
+        // Handle Sign In
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        toast.success("Successfully signed in!");
+        navigate("/settings");
+      } else {
+        // Handle Sign Up
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+            },
+          },
+        });
+
+        if (error) throw error;
+
+        toast.success("Successfully signed up! Please check your email for verification.");
+        setIsSignIn(true);
+      }
+    } catch (error: any) {
+      console.error("Auth error:", error);
+      toast.error(error.message || "An error occurred during authentication");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleSignIn = () => {
-    // Add Google authentication logic here
-    console.log("Google sign in clicked");
+  const handleGoogleSignIn = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
+      console.error("Google sign in error:", error);
+      toast.error("Error signing in with Google");
+    }
   };
 
   return (
@@ -66,6 +113,24 @@ const Auth = () => {
               {isSignIn ? "Sign In" : "Create Account"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {!isSignIn && (
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-2.5 h-5 w-5 text-olive/40" />
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder="John Doe"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+              
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -81,6 +146,7 @@ const Auth = () => {
                   />
                 </div>
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -107,9 +173,19 @@ const Auth = () => {
                 </Button>
               )}
 
-              <Button type="submit" className="w-full bg-olive hover:bg-olive/90">
-                {isSignIn ? "Sign In" : "Create Account"}
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button 
+                type="submit" 
+                className="w-full bg-olive hover:bg-olive/90"
+                disabled={loading}
+              >
+                {loading ? (
+                  "Loading..."
+                ) : (
+                  <>
+                    {isSignIn ? "Sign In" : "Create Account"}
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
               </Button>
 
               <div className="relative my-6">
