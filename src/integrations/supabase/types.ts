@@ -87,6 +87,45 @@ export type Database = {
           },
         ]
       }
+      communities: {
+        Row: {
+          description: string | null
+          id: string
+          member_count: number | null
+          name: string
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          member_count?: number | null
+          name: string
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          member_count?: number | null
+          name?: string
+        }
+        Relationships: []
+      }
+      dietary_requirements: {
+        Row: {
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       followers: {
         Row: {
           created_at: string | null
@@ -122,6 +161,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      hashtags: {
+        Row: {
+          id: string
+          name: string
+          post_count: number | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          post_count?: number | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          post_count?: number | null
+        }
+        Relationships: []
       }
       likes: {
         Row: {
@@ -196,6 +253,8 @@ export type Database = {
           caption: string
           comments_count: number | null
           created_at: string | null
+          dietary_requirement_id: string | null
+          hashtag_id: string | null
           id: string
           image_url: string | null
           likes_count: number | null
@@ -206,6 +265,8 @@ export type Database = {
           caption: string
           comments_count?: number | null
           created_at?: string | null
+          dietary_requirement_id?: string | null
+          hashtag_id?: string | null
           id?: string
           image_url?: string | null
           likes_count?: number | null
@@ -216,6 +277,8 @@ export type Database = {
           caption?: string
           comments_count?: number | null
           created_at?: string | null
+          dietary_requirement_id?: string | null
+          hashtag_id?: string | null
           id?: string
           image_url?: string | null
           likes_count?: number | null
@@ -223,6 +286,20 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "posts_dietary_requirement_id_fkey"
+            columns: ["dietary_requirement_id"]
+            isOneToOne: false
+            referencedRelation: "dietary_requirements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_hashtag_id_fkey"
+            columns: ["hashtag_id"]
+            isOneToOne: false
+            referencedRelation: "hashtags"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "posts_user_id_fkey"
             columns: ["user_id"]
