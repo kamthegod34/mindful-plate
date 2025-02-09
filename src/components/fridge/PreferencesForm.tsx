@@ -4,8 +4,9 @@ import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import RangeSlider from "./RangeSlider";
+import ExcludeIngredients from "./ExcludeIngredients";
 
 interface Preferences {
   minProtein: number;
@@ -48,111 +49,56 @@ const PreferencesForm = ({
     });
   };
 
-  const handleProteinChange = (values: number[]) => {
-    if (values[0] !== preferences.minProtein || values[1] !== preferences.maxProtein) {
-      onPreferencesChange({
-        ...preferences,
-        minProtein: values[0],
-        maxProtein: values[1]
-      });
-    }
-  };
-
-  const handleCaloriesChange = (values: number[]) => {
-    if (values[0] !== preferences.minCalories || values[1] !== preferences.maxCalories) {
-      onPreferencesChange({
-        ...preferences,
-        minCalories: values[0],
-        maxCalories: values[1]
-      });
-    }
-  };
-
-  const handleServingsChange = (values: number[]) => {
-    if (values[0] !== preferences.minServings || values[1] !== preferences.maxServings) {
-      onPreferencesChange({
-        ...preferences,
-        minServings: values[0],
-        maxServings: values[1]
-      });
-    }
-  };
-
   return (
     <Card className="p-6 space-y-6 bg-white/50 backdrop-blur-sm">
       <h2 className="text-xl font-semibold text-olive">Your Preferences</h2>
       
       <div className="space-y-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-olive flex items-center gap-2">
-            <Scale className="w-4 h-4" />
-            Protein Range (g)
-          </label>
-          <div className="space-y-6">
-            <div>
-              <div className="flex justify-between text-sm text-olive-light mb-2">
-                <span>Minimum: {preferences.minProtein}g</span>
-                <span>Maximum: {preferences.maxProtein}g</span>
-              </div>
-              <Slider
-                defaultValue={[preferences.minProtein, preferences.maxProtein]}
-                value={[preferences.minProtein, preferences.maxProtein]}
-                onValueChange={handleProteinChange}
-                max={100}
-                step={5}
-                className="w-full"
-              />
-            </div>
-          </div>
-        </div>
+        <RangeSlider
+          icon={<Scale className="w-4 h-4" />}
+          label="Protein Range (g)"
+          minValue={preferences.minProtein}
+          maxValue={preferences.maxProtein}
+          max={100}
+          step={5}
+          unit="g"
+          onChange={(values) => onPreferencesChange({
+            ...preferences,
+            minProtein: values[0],
+            maxProtein: values[1]
+          })}
+        />
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-olive flex items-center gap-2">
-            <Scale className="w-4 h-4" />
-            Calories Range
-          </label>
-          <div className="space-y-6">
-            <div>
-              <div className="flex justify-between text-sm text-olive-light mb-2">
-                <span>Minimum: {preferences.minCalories} kcal</span>
-                <span>Maximum: {preferences.maxCalories} kcal</span>
-              </div>
-              <Slider
-                defaultValue={[preferences.minCalories, preferences.maxCalories]}
-                value={[preferences.minCalories, preferences.maxCalories]}
-                onValueChange={handleCaloriesChange}
-                min={50}
-                max={2000}
-                step={50}
-                className="w-full"
-              />
-            </div>
-          </div>
-        </div>
+        <RangeSlider
+          icon={<Scale className="w-4 h-4" />}
+          label="Calories Range"
+          minValue={preferences.minCalories}
+          maxValue={preferences.maxCalories}
+          min={50}
+          max={2000}
+          step={50}
+          unit=" kcal"
+          onChange={(values) => onPreferencesChange({
+            ...preferences,
+            minCalories: values[0],
+            maxCalories: values[1]
+          })}
+        />
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-olive flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            Servings Range
-          </label>
-          <div className="space-y-6">
-            <div>
-              <div className="flex justify-between text-sm text-olive-light mb-2">
-                <span>Minimum: {preferences.minServings}</span>
-                <span>Maximum: {preferences.maxServings}</span>
-              </div>
-              <Slider
-                defaultValue={[preferences.minServings, preferences.maxServings]}
-                value={[preferences.minServings, preferences.maxServings]}
-                onValueChange={handleServingsChange}
-                min={1}
-                max={8}
-                step={1}
-                className="w-full"
-              />
-            </div>
-          </div>
-        </div>
+        <RangeSlider
+          icon={<Users className="w-4 h-4" />}
+          label="Servings Range"
+          minValue={preferences.minServings}
+          maxValue={preferences.maxServings}
+          min={1}
+          max={8}
+          step={1}
+          onChange={(values) => onPreferencesChange({
+            ...preferences,
+            minServings: values[0],
+            maxServings: values[1]
+          })}
+        />
 
         <div className="space-y-2">
           <label className="text-sm font-medium text-olive flex items-center gap-2">
@@ -199,38 +145,11 @@ const PreferencesForm = ({
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-olive">
-            Exclude Ingredients
-          </label>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Enter ingredient to exclude"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleExcludeIngredient((e.target as HTMLInputElement).value);
-                  (e.target as HTMLInputElement).value = '';
-                }
-              }}
-            />
-          </div>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {preferences.excludeIngredients.map((ingredient) => (
-              <span
-                key={ingredient}
-                className="bg-olive/10 text-olive px-2 py-1 rounded-full text-sm flex items-center gap-1"
-              >
-                {ingredient}
-                <button
-                  onClick={() => handleRemoveExcluded(ingredient)}
-                  className="hover:text-olive-dark"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-        </div>
+        <ExcludeIngredients
+          excludeIngredients={preferences.excludeIngredients}
+          onExcludeIngredient={handleExcludeIngredient}
+          onRemoveExcluded={handleRemoveExcluded}
+        />
       </div>
 
       <Button
