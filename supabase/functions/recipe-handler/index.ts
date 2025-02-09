@@ -54,15 +54,28 @@ serve(async (req) => {
           excludeIngredients 
         } = params;
         
+        // Validate ingredients
         if (!ingredients || !Array.isArray(ingredients)) {
           console.error('Invalid ingredients format:', ingredients);
           throw new Error('Invalid ingredients format');
+        }
+
+        if (ingredients.length === 0) {
+          console.error('No ingredients provided');
+          throw new Error('No ingredients provided');
+        }
+
+        // Validate that ingredients are non-empty strings
+        const validIngredients = ingredients.filter(i => typeof i === 'string' && i.trim().length > 0);
+        if (validIngredients.length === 0) {
+          console.error('No valid ingredients provided');
+          throw new Error('No valid ingredients provided');
         }
         
         // Build query parameters for complexSearch
         const queryParts = [
           `apiKey=${SPOONACULAR_API_KEY}`,
-          `includeIngredients=${ingredients.join(',')}`,
+          `includeIngredients=${validIngredients.join(',')}`,
           `minProtein=${minProtein || 0}`,
           `maxProtein=${maxProtein || 100}`,
           `minCalories=${minCalories || 50}`,
@@ -131,7 +144,7 @@ serve(async (req) => {
         error: error.message,
         details: error.stack 
       }), {
-        status: 500,
+        status: 400,
         headers: corsHeaders
       }
     );

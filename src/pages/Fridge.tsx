@@ -41,8 +41,8 @@ const Fridge = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
 
   const handleAddIngredient = (ingredient: string) => {
-    if (!ingredients.includes(ingredient)) {
-      setIngredients([...ingredients, ingredient]);
+    if (ingredient.trim() && !ingredients.includes(ingredient)) {
+      setIngredients([...ingredients, ingredient.trim()]);
     }
   };
 
@@ -51,7 +51,8 @@ const Fridge = () => {
   };
 
   const handleSearch = async () => {
-    if (ingredients.length === 0) {
+    // Validate ingredients
+    if (!ingredients || ingredients.length === 0) {
       toast({
         title: "No ingredients added",
         description: "Please add at least one ingredient to search for recipes.",
@@ -60,18 +61,32 @@ const Fridge = () => {
       return;
     }
 
+    // Filter out empty ingredients
+    const validIngredients = ingredients.filter(i => i.trim().length > 0);
+    if (validIngredients.length === 0) {
+      toast({
+        title: "Invalid ingredients",
+        description: "Please add valid ingredients to search for recipes.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       console.log('Calling recipe-handler function with:', {
-        ingredients,
-        preferences,
+        type: 'byPreferences',
+        params: {
+          ingredients: validIngredients,
+          ...preferences,
+        }
       });
 
       const { data, error } = await supabase.functions.invoke('recipe-handler', {
         body: {
           type: 'byPreferences',
           params: {
-            ingredients,
+            ingredients: validIngredients,
             minProtein: preferences.minProtein,
             maxProtein: preferences.maxProtein,
             minCalories: preferences.minCalories,
@@ -96,6 +111,7 @@ const Fridge = () => {
         toast({
           title: "No recipes found",
           description: "Try adjusting your preferences or adding different ingredients.",
+          variant: "default",
         });
         setRecipes([]);
         return;
@@ -120,7 +136,7 @@ const Fridge = () => {
       console.error('Error fetching recipes:', error);
       toast({
         title: "Error fetching recipes",
-        description: "Please try again later or check the console for more details.",
+        description: error.message || "Please try again later.",
         variant: "destructive",
       });
       setRecipes([]);
@@ -172,7 +188,7 @@ const Fridge = () => {
       console.error('Error fetching recipe details:', error);
       toast({
         title: "Error fetching recipe details",
-        description: "Please try again later or check the console for more details.",
+        description: error.message || "Please try again later.",
         variant: "destructive",
       });
     } finally {
