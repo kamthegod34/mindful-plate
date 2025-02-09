@@ -1,6 +1,8 @@
 
 import { Card } from "@/components/ui/card";
 import { Scale, Timer, DollarSign } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SortOption } from "@/hooks/useRecipes";
 
 interface Recipe {
   id: string;
@@ -17,11 +19,27 @@ interface Recipe {
 interface RecipeListProps {
   recipes: Recipe[];
   onSelectRecipe: (recipeId: string) => void;
+  sortBy: SortOption;
+  onSort: (value: SortOption) => void;
 }
 
-const RecipeList = ({ recipes, onSelectRecipe }: RecipeListProps) => {
+const RecipeList = ({ recipes, onSelectRecipe, sortBy, onSort }: RecipeListProps) => {
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <Select value={sortBy} onValueChange={value => onSort(value as SortOption)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Sort by..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="protein">Highest Protein</SelectItem>
+            <SelectItem value="calories">Lowest Calories</SelectItem>
+            <SelectItem value="time">Quickest</SelectItem>
+            <SelectItem value="cost">Lowest Cost</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       {recipes.map((recipe) => (
         <Card
           key={recipe.id}

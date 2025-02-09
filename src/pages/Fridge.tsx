@@ -11,7 +11,7 @@ import { useIngredients } from "@/hooks/useIngredients";
 import { usePreferences } from "@/hooks/usePreferences";
 
 const Fridge = () => {
-  const { recipes, loading, selectedRecipe, searchRecipes, fetchRecipeDetails, setSelectedRecipe } = useRecipes();
+  const { recipes, loading, selectedRecipe, searchRecipes, fetchRecipeDetails, setSelectedRecipe, sortBy, setSortBy } = useRecipes();
   const { ingredients, addIngredient, removeIngredient } = useIngredients();
   const { preferences, setPreferences } = usePreferences();
 
@@ -48,6 +48,8 @@ const Fridge = () => {
               <RecipeList
                 recipes={recipes}
                 onSelectRecipe={fetchRecipeDetails}
+                sortBy={sortBy}
+                onSort={setSortBy}
               />
             ) : (
               <div className="text-center text-olive-light p-4">

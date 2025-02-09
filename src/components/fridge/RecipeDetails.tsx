@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Scale, Timer, DollarSign, ShoppingCart } from "lucide-react";
+import { Scale, Timer, DollarSign, ShoppingCart, ExternalLink } from "lucide-react";
 
 interface Recipe {
   id: string;
@@ -14,6 +14,7 @@ interface Recipe {
   cost: number;
   ingredients: string[];
   instructions: string[];
+  sourceUrl?: string;
 }
 
 interface RecipeDetailsProps {
@@ -41,7 +42,20 @@ const RecipeDetails = ({ recipe, onBack }: RecipeDetailsProps) => {
             alt={recipe.title}
             className="w-full h-48 object-cover rounded-lg"
           />
-          <h2 className="text-2xl font-semibold text-olive">{recipe.title}</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold text-olive">{recipe.title}</h2>
+            {recipe.sourceUrl && (
+              <a 
+                href={recipe.sourceUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-olive hover:text-olive-dark"
+              >
+                <ExternalLink className="w-4 h-4 mr-1" />
+                View Original
+              </a>
+            )}
+          </div>
 
           <div className="flex flex-wrap gap-4 text-sm text-olive-light">
             <span className="flex items-center gap-1">

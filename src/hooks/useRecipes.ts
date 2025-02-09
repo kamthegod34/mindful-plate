@@ -13,6 +13,7 @@ export interface Recipe {
   cost: number;
   ingredients: string[];
   instructions: string[];
+  sourceUrl?: string;
 }
 
 export interface RecipePreferences {
@@ -27,11 +28,31 @@ export interface RecipePreferences {
   excludeIngredients: string[];
 }
 
+export type SortOption = 'protein' | 'calories' | 'time' | 'cost';
+
 export function useRecipes() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [sortBy, setSortBy] = useState<SortOption>('time');
+
+  const sortRecipes = (recipes: Recipe[], sortBy: SortOption) => {
+    return [...recipes].sort((a, b) => {
+      switch (sortBy) {
+        case 'protein':
+          return b.protein - a.protein;
+        case 'calories':
+          return a.calories - b.calories;
+        case 'time':
+          return a.time - b.time;
+        case 'cost':
+          return a.cost - b.cost;
+        default:
+          return 0;
+      }
+    });
+  };
 
   const searchRecipes = async (ingredients: string[], preferences: RecipePreferences) => {
     // Validate ingredients
@@ -103,10 +124,12 @@ export function useRecipes() {
         cost: Math.round(recipe.pricePerServing / 100) || 0,
         ingredients: recipe.extendedIngredients?.map(i => i.original) || [],
         instructions: recipe.analyzedInstructions?.[0]?.steps?.map(s => s.step) || [],
+        sourceUrl: recipe.sourceUrl,
       }));
 
-      console.log('✅ Setting recipes state with:', transformedRecipes);
-      setRecipes(transformedRecipes);
+      const sortedRecipes = sortRecipes(transformedRecipes, sortBy);
+      console.log('✅ Setting recipes state with:', sortedRecipes);
+      setRecipes(sortedRecipes);
     } catch (error) {
       console.error('Error fetching recipes:', error);
       toast({
@@ -156,6 +179,7 @@ export function useRecipes() {
         cost: Math.round(data.pricePerServing / 100) || 0,
         ingredients: data.extendedIngredients?.map(i => i.original) || [],
         instructions: data.analyzedInstructions?.[0]?.steps?.map(s => s.step) || [],
+        sourceUrl: data.sourceUrl,
       };
       
       setSelectedRecipe(recipe);
@@ -178,5 +202,7 @@ export function useRecipes() {
     searchRecipes,
     fetchRecipeDetails,
     setSelectedRecipe,
+    sortBy,
+    setSortBy,
   };
 }
