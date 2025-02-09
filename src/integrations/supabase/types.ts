@@ -180,6 +180,38 @@ export type Database = {
         }
         Relationships: []
       }
+      ingredients: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          quantity: string
+          recipe_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          quantity: string
+          recipe_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          quantity?: string
+          recipe_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingredients_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       likes: {
         Row: {
           created_at: string | null
@@ -309,6 +341,39 @@ export type Database = {
           },
         ]
       }
+      recipe_dietary_requirements: {
+        Row: {
+          dietary_requirement_id: string | null
+          id: string
+          recipe_id: string | null
+        }
+        Insert: {
+          dietary_requirement_id?: string | null
+          id?: string
+          recipe_id?: string | null
+        }
+        Update: {
+          dietary_requirement_id?: string | null
+          id?: string
+          recipe_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_dietary_requirements_dietary_requirement_id_fkey"
+            columns: ["dietary_requirement_id"]
+            isOneToOne: false
+            referencedRelation: "dietary_requirements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_dietary_requirements_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recipes: {
         Row: {
           calories: number | null
@@ -361,6 +426,65 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shopping_list: {
+        Row: {
+          created_at: string | null
+          id: string
+          recipe_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          recipe_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          recipe_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopping_list_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_preferences: {
+        Row: {
+          created_at: string | null
+          id: string
+          max_calories: number | null
+          max_cost: number | null
+          max_time_minutes: number | null
+          min_protein: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          max_calories?: number | null
+          max_cost?: number | null
+          max_time_minutes?: number | null
+          min_protein?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          max_calories?: number | null
+          max_cost?: number | null
+          max_time_minutes?: number | null
+          min_protein?: number | null
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
