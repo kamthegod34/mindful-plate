@@ -17,7 +17,6 @@ export type Database = {
           id: string
           is_verified: boolean | null
           last_login: string | null
-          password: string
           profile_picture: string | null
           role: string | null
           updated_at: string | null
@@ -30,7 +29,6 @@ export type Database = {
           id?: string
           is_verified?: boolean | null
           last_login?: string | null
-          password: string
           profile_picture?: string | null
           role?: string | null
           updated_at?: string | null
@@ -43,7 +41,6 @@ export type Database = {
           id?: string
           is_verified?: boolean | null
           last_login?: string | null
-          password?: string
           profile_picture?: string | null
           role?: string | null
           updated_at?: string | null

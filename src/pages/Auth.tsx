@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -17,13 +16,35 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const validateForm = () => {
+    if (!email) {
+      toast.error("Please enter your email");
+      return false;
+    }
+    if (!password) {
+      toast.error("Please enter your password");
+      return false;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return false;
+    }
+    if (!isSignIn && !fullName) {
+      toast.error("Please enter your full name");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) return;
+    
     setLoading(true);
 
     try {
       if (isSignIn) {
-        // Handle Sign In
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -34,7 +55,6 @@ const Auth = () => {
         toast.success("Successfully signed in!");
         navigate("/settings");
       } else {
-        // Handle Sign Up
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -47,12 +67,25 @@ const Auth = () => {
 
         if (error) throw error;
 
-        toast.success("Successfully signed up! Please check your email for verification.");
-        setIsSignIn(true);
+        if (data?.user?.identities?.length === 0) {
+          toast.error("This email is already registered. Please sign in instead.");
+          setIsSignIn(true);
+        } else {
+          toast.success("Successfully signed up! Please check your email for verification.");
+          setIsSignIn(true);
+        }
       }
     } catch (error: any) {
       console.error("Auth error:", error);
-      toast.error(error.message || "An error occurred during authentication");
+      let errorMessage = "An error occurred during authentication";
+      
+      if (error.message.includes("Invalid login credentials")) {
+        errorMessage = "Invalid email or password";
+      } else if (error.message.includes("Email rate limit exceeded")) {
+        errorMessage = "Too many attempts. Please try again later";
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -62,6 +95,9 @@ const Auth = () => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth`,
+        },
       });
       
       if (error) throw error;
@@ -74,7 +110,6 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-beige flex items-center justify-center p-4">
       <div className="container max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        {/* Left side - Welcome text */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -102,7 +137,6 @@ const Auth = () => {
           </div>
         </motion.div>
 
-        {/* Right side - Auth form */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -159,6 +193,7 @@ const Auth = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10"
                     required
+                    minLength={6}
                   />
                 </div>
               </div>
