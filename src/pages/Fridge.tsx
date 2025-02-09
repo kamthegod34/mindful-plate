@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import BottomNav from "@/components/BottomNav";
 import { User } from "lucide-react";
@@ -80,7 +81,7 @@ const Fridge = () => {
 
       console.log('Received response:', data);
 
-      if (!data?.recipes || data.recipes.length === 0) {
+      if (!data?.recipes || !Array.isArray(data.recipes) || data.recipes.length === 0) {
         toast({
           title: "No recipes found",
           description: "Try adjusting your preferences or adding different ingredients.",
@@ -89,7 +90,24 @@ const Fridge = () => {
         return;
       }
 
-      setRecipes(data.recipes);
+      // Verify the data structure before updating state
+      const validRecipes = data.recipes.filter(recipe => 
+        recipe.id && 
+        recipe.title && 
+        recipe.image && 
+        typeof recipe.protein === 'number' &&
+        typeof recipe.calories === 'number' &&
+        typeof recipe.time === 'number' &&
+        typeof recipe.cost === 'number'
+      );
+
+      if (validRecipes.length === 0) {
+        console.error('Invalid recipe data structure:', data.recipes);
+        throw new Error('Invalid recipe data structure received from API');
+      }
+
+      console.log('✅ Setting recipes state with:', validRecipes);
+      setRecipes(validRecipes);
     } catch (error) {
       console.error('Error fetching recipes:', error);
       toast({
@@ -97,6 +115,7 @@ const Fridge = () => {
         description: "Please try again later or check the console for more details.",
         variant: "destructive",
       });
+      setRecipes([]);
     } finally {
       setLoading(false);
     }
@@ -163,10 +182,16 @@ const Fridge = () => {
               loading={loading}
             />
 
-            <RecipeList
-              recipes={recipes}
-              onSelectRecipe={handleRecipeSelect}
-            />
+            {recipes.length > 0 ? (
+              <RecipeList
+                recipes={recipes}
+                onSelectRecipe={handleRecipeSelect}
+              />
+            ) : (
+              <div className="text-center text-olive-light p-4">
+                {loading ? 'Searching for recipes...' : 'No recipes found. Try adding ingredients and search!'}
+              </div>
+            )}
           </>
         ) : (
           <RecipeDetails
