@@ -5,6 +5,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 const SPOONACULAR_BASE_URL = "https://api.spoonacular.com";
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -20,29 +21,53 @@ serve(async (req) => {
     let queryParams = '';
 
     switch (type) {
-      case 'byPreferences':
+      case 'byPreferences': {
         endpoint = '/recipes/complexSearch';
-        const { minProtein, maxTime, maxCost, maxCalories } = params;
-        queryParams = `?minProtein=${minProtein}&maxReadyTime=${maxTime}&maxPrice=${maxCost}&maxCalories=${maxCalories}&number=10`;
+        const { ingredients, minProtein, maxTime, maxCost, maxCalories } = params;
+        
+        // Build query parameters
+        const queryParts = [
+          `apiKey=${SPOONACULAR_API_KEY}`,
+          `includeIngredients=${ingredients.join(',')}`,
+          `minProtein=${minProtein}`,
+          `maxReadyTime=${maxTime}`,
+          `maxPrice=${maxCost}`,
+          `maxCalories=${maxCalories}`,
+          'number=10',
+          'addRecipeInformation=true',
+          'fillIngredients=true'
+        ];
+        
+        queryParams = '?' + queryParts.join('&');
         break;
+      }
       
-      case 'details':
+      case 'details': {
         const { recipeId } = params;
         endpoint = `/recipes/${recipeId}/information`;
-        queryParams = '?';
+        queryParams = `?apiKey=${SPOONACULAR_API_KEY}`;
         break;
+      }
 
       default:
         throw new Error('Invalid request type');
     }
 
+    console.log(`Fetching from: ${SPOONACULAR_BASE_URL}${endpoint}${queryParams}`);
+
     const response = await fetch(
-      `${SPOONACULAR_BASE_URL}${endpoint}${queryParams}&apiKey=${SPOONACULAR_API_KEY}`,
-      { headers: { 'Content-Type': 'application/json' } }
+      `${SPOONACULAR_BASE_URL}${endpoint}${queryParams}`,
+      { 
+        headers: { 
+          'Content-Type': 'application/json'
+        } 
+      }
     );
 
     if (!response.ok) {
-      throw new Error(`Spoonacular API error: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('Spoonacular API error:', errorText);
+      throw new Error(`Spoonacular API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -52,10 +77,15 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Error:', error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.error('Error in recipes function:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });

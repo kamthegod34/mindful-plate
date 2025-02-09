@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
-import { User, Search, Scale, Timer, DollarSign } from "lucide-react";
+import { User, Search, Scale, Timer, DollarSign, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -61,22 +62,27 @@ const Fridge = () => {
         body: {
           type: 'byPreferences',
           params: {
-            ingredients,
-            ...preferences,
+            ingredients: ingredients,
+            minProtein: preferences.minProtein,
+            maxTime: preferences.maxTime,
+            maxCost: preferences.maxCost,
+            maxCalories: preferences.maxCalories,
           },
         },
       });
 
       if (error) throw error;
 
-      setRecipes(data.results || []);
-      
-      if (data.results.length === 0) {
+      if (!data?.results || data.results.length === 0) {
         toast({
           title: "No recipes found",
           description: "Try adjusting your preferences or adding different ingredients.",
         });
+        setRecipes([]);
+        return;
       }
+
+      setRecipes(data.results);
     } catch (error) {
       console.error('Error fetching recipes:', error);
       toast({
