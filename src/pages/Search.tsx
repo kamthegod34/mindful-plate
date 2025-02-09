@@ -1,18 +1,11 @@
 
 import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
-import { Search as SearchIcon, User, X } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import SearchHeader from "@/components/search/SearchHeader";
+import SearchBar from "@/components/search/SearchBar";
+import SearchFilters from "@/components/search/SearchFilters";
+import SearchResults from "@/components/search/SearchResults";
 
 interface SearchResult {
   id: string;
@@ -139,125 +132,24 @@ const Search = () => {
 
   return (
     <div className="min-h-screen bg-beige pb-20">
-      <header className="bg-beige p-4 z-40 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-olive italic">MindfulPlate</h1>
-        <Link to="/profile" className="p-2 hover:bg-beige-light rounded-full transition-colors">
-          <User className="w-6 h-6 text-olive" />
-        </Link>
-      </header>
-
+      <SearchHeader />
       <div className="p-4 space-y-4">
-        {/* Search Bar */}
-        <div className="relative">
-          <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <Input
-            type="text"
-            placeholder="Search users, hashtags, or communities..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-10 bg-white/80 border-gray-200 focus:ring-0 focus:border-olive/30"
-          />
-          {searchQuery && (
-            <button
-              onClick={clearSearch}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2"
-            >
-              <X className="w-4 h-4 text-gray-400" />
-            </button>
-          )}
-        </div>
-
-        {/* Filters */}
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          <Select value={activeFilter} onValueChange={setActiveFilter}>
-            <SelectTrigger className="w-[140px] bg-white/80">
-              <SelectValue placeholder="Filter by type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="users">Users</SelectItem>
-              <SelectItem value="hashtags">Hashtags</SelectItem>
-              <SelectItem value="communities">Communities</SelectItem>
-              <SelectItem value="dietary">Dietary</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={selectedDiet} onValueChange={setSelectedDiet}>
-            <SelectTrigger className="w-[140px] bg-white/80">
-              <SelectValue placeholder="Dietary" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="vegan">Vegan</SelectItem>
-              <SelectItem value="vegetarian">Vegetarian</SelectItem>
-              <SelectItem value="pescatarian">Pescatarian</SelectItem>
-              <SelectItem value="keto">Keto</SelectItem>
-              <SelectItem value="paleo">Paleo</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Search Results */}
-        <div className="space-y-2">
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-olive" />
-            </div>
-          ) : (
-            results.map((result) => (
-              <div
-                key={`${result.type}-${result.id}`}
-                className="flex items-center p-3 bg-white/80 rounded-lg hover:bg-white transition-colors"
-              >
-                {(result.type === "user" || result.type === "community") && (
-                  <>
-                    <img
-                      src={result.profile_picture || "/placeholder.svg"}
-                      alt=""
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                    <div className="ml-3">
-                      <p className="font-semibold">
-                        {result.type === "user" ? result.username : result.name}
-                      </p>
-                      {result.type === "community" && result.member_count && (
-                        <p className="text-sm text-gray-500">
-                          {result.member_count.toLocaleString()} members
-                        </p>
-                      )}
-                      {result.description && (
-                        <p className="text-sm text-gray-500 line-clamp-1">
-                          {result.description}
-                        </p>
-                      )}
-                    </div>
-                  </>
-                )}
-                {result.type === "hashtag" && (
-                  <div className="py-2">
-                    <p className="font-semibold">#{result.name}</p>
-                    {result.post_count && (
-                      <p className="text-sm text-gray-500">
-                        {result.post_count.toLocaleString()} posts
-                      </p>
-                    )}
-                  </div>
-                )}
-                {result.type === "dietary" && (
-                  <div className="py-2">
-                    <p className="font-semibold">{result.name}</p>
-                    {result.description && (
-                      <p className="text-sm text-gray-500">{result.description}</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-          {!loading && searchQuery && results.length === 0 && (
-            <p className="text-center text-gray-500 py-8">No results found</p>
-          )}
-        </div>
+        <SearchBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          clearSearch={clearSearch}
+        />
+        <SearchFilters
+          activeFilter={activeFilter}
+          setActiveFilter={setActiveFilter}
+          selectedDiet={selectedDiet}
+          setSelectedDiet={setSelectedDiet}
+        />
+        <SearchResults
+          results={results}
+          loading={loading}
+          searchQuery={searchQuery}
+        />
       </div>
       <BottomNav />
     </div>
@@ -265,3 +157,4 @@ const Search = () => {
 };
 
 export default Search;
+
