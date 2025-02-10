@@ -39,8 +39,6 @@ enable_confirmations = false
 [functions]
 [functions.recipe-handler]
 verify_jwt = false
-memory = 512
-timeout = 10
 
 [analytics]
 enabled = false
